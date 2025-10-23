@@ -1,0 +1,141 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: killamani-postgres
+    environment:
+      POSTGRES_USER: killamani
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-killamani_dev_password}
+      POSTGRES_DB: killamani
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U killamani"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - killamani-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: killamani-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - killamani-network
+
+  # Backend API (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: killamani-backend
+    environment:
+      # Database
+      DATABASE_URL: postgresql://killamani:${POSTGRES_PASSWORD:-killamani_dev_password}@postgres:5432/killamani
+
+      # Redis
+      REDIS_URL: redis://redis:6379/0
+
+      # JWT
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-secret-key-change-in-production}
+      JWT_ALGORITHM: HS256
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      JWT_REFRESH_TOKEN_EXPIRE_DAYS: 7
+
+      # Astro Calculator
+      CALCULATOR_PROVIDER: kerykeion
+      DEFAULT_HOUSE_SYSTEM: placidus
+
+      # Storage
+      STORAGE_PROVIDER: local
+      STORAGE_PATH: /app/storage
+
+      # Interpreter
+      INTERPRETER_PROVIDER: rule_based
+
+      # App
+      ENVIRONMENT: production
+      LOG_LEVEL: info
+      CORS_ORIGINS: http://localhost:3000,http://localhost
+
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/src:/app/src
+      - chart_storage:/app/storage
+      - ./backend/logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - killamani-network
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000
+
+  # Frontend (React + Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: killamani-frontend
+    environment:
+      VITE_API_URL: http://localhost:8000
+      VITE_APP_NAME: Killamani
+      VITE_ENV: production
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - killamani-network
+
+  # Nginx Reverse Proxy (Production)
+  nginx:
+    image: nginx:alpine
+    container_name: killamani-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - chart_storage:/var/www/charts:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - killamani-network
+    profiles:
+      - production
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  chart_storage:
+    driver: local
+
+networks:
+  killamani-network:
+    driver: bridge

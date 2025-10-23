@@ -1,0 +1,75 @@
+{
+  "planets_in_signs": {
+    "sun_in_aries": "Sun in Aries: You are a natural leader with pioneering spirit and enthusiasm. Your direct approach and competitive nature drive you to take initiative.",
+    "sun_in_taurus": "Sun in Taurus: You value stability, security, and material comfort. Your practical nature and determination help you build lasting foundations.",
+    "sun_in_gemini": "Sun in Gemini: You are intellectually curious, versatile, and communicative. Your adaptable nature allows you to connect ideas and people.",
+    "sun_in_cancer": "Sun in Cancer: You are nurturing, protective, and emotionally intuitive. Your strong connection to family and home provides your foundation.",
+    "sun_in_leo": "Sun in Leo: You are creative, generous, and naturally charismatic. Your confident self-expression and warmth draw others to you.",
+    "sun_in_virgo": "Sun in Virgo: You are analytical, detail-oriented, and service-minded. Your practical perfectionism helps you improve everything you touch.",
+    "sun_in_libra": "Sun in Libra: You seek harmony, balance, and beautiful relationships. Your diplomatic nature helps create peace and cooperation.",
+    "sun_in_scorpio": "Sun in Scorpio: You are intense, transformative, and deeply perceptive. Your emotional depth and determination drive profound change.",
+    "sun_in_sagittarius": "Sun in Sagittarius: You are optimistic, adventurous, and philosophical. Your quest for meaning and truth expands your horizons.",
+    "sun_in_capricorn": "Sun in Capricorn: You are ambitious, disciplined, and responsible. Your steady climb toward goals reflects your mastery of time.",
+    "sun_in_aquarius": "Sun in Aquarius: You are innovative, humanitarian, and independent. Your unique vision helps create progressive change.",
+    "sun_in_pisces": "Sun in Pisces: You are compassionate, imaginative, and spiritually attuned. Your empathic nature connects you to universal consciousness.",
+
+    "moon_in_aries": "Moon in Aries: You react with directness and spontaneity. Emotional independence is crucial for your wellbeing.",
+    "moon_in_taurus": "Moon in Taurus: You need emotional security and physical comfort. Stability in your environment soothes your soul.",
+    "moon_in_gemini": "Moon in Gemini: You process emotions intellectually and need mental stimulation. Communication helps you understand your feelings.",
+    "moon_in_cancer": "Moon in Cancer: Your emotions run deep and nurturing comes naturally. Home and family are your emotional anchors.",
+    "moon_in_leo": "Moon in Leo: You need recognition and creative self-expression. Warmth and generosity characterize your emotional nature.",
+    "moon_in_virgo": "Moon in Virgo: You feel secure through order and helpfulness. Analyzing emotions helps you process them.",
+    "moon_in_libra": "Moon in Libra: You need harmonious relationships for emotional balance. Partnership soothes your soul.",
+    "moon_in_scorpio": "Moon in Scorpio: Your emotions are intense and transformative. Emotional depth and privacy are essential.",
+    "moon_in_sagittarius": "Moon in Sagittarius: You need freedom and adventure for emotional wellbeing. Optimism lifts your spirits.",
+    "moon_in_capricorn": "Moon in Capricorn: You find security through achievement and structure. Emotional control provides comfort.",
+    "moon_in_aquarius": "Moon in Aquarius: You need emotional independence and intellectual connection. Humanitarian concerns touch your heart.",
+    "moon_in_pisces": "Moon in Pisces: You are emotionally sensitive and empathic. Spiritual connection provides emotional nourishment."
+  },
+
+  "planets_in_houses": {
+    "sun_in_house_1": "Sun in 1st House: Your identity and self-expression are central to your life path. You shine through personal presence.",
+    "sun_in_house_2": "Sun in 2nd House: Building security and developing talents are key themes. Your values shape your identity.",
+    "sun_in_house_3": "Sun in 3rd House: Communication and learning are central to your purpose. You shine through ideas and connections.",
+    "sun_in_house_4": "Sun in 4th House: Home, family, and roots are fundamental to your identity. Private life is your foundation.",
+    "sun_in_house_5": "Sun in 5th House: Creative self-expression and joy are your life's focus. You shine through artistic endeavors.",
+    "sun_in_house_6": "Sun in 6th House: Service, health, and daily work define your purpose. You shine through useful contribution.",
+    "sun_in_house_7": "Sun in 7th House: Partnerships and relationships are central to your identity. You shine through collaboration.",
+    "sun_in_house_8": "Sun in 8th House: Transformation and shared resources shape your path. You shine through depth and intensity.",
+    "sun_in_house_9": "Sun in 9th House: Philosophy, travel, and higher learning define you. You shine through expansion and wisdom.",
+    "sun_in_house_10": "Sun in 10th House: Career and public recognition are central themes. You shine in the public eye.",
+    "sun_in_house_11": "Sun in 11th House: Friendship, groups, and ideals shape your purpose. You shine through community involvement.",
+    "sun_in_house_12": "Sun in 12th House: Spirituality and transcendence define your path. You shine through compassion and service."
+  },
+
+  "aspects": {
+    "sun_conjunction_moon": "Sun conjunct Moon: Your emotions and identity are unified, creating strong self-awareness and purpose.",
+    "sun_square_mars": "Sun square Mars: Tension between will and action creates dynamic energy that needs constructive outlets.",
+    "sun_trine_jupiter": "Sun trine Jupiter: Optimism and growth come naturally, expanding your sense of possibility and confidence.",
+    "sun_opposition_saturn": "Sun opposition Saturn: Balancing self-expression with responsibility creates maturity through challenge.",
+    "moon_conjunction_venus": "Moon conjunct Venus: Emotional and aesthetic sensibilities merge beautifully, creating harmony in relationships.",
+    "mercury_sextile_mars": "Mercury sextile Mars: Mental energy and assertion combine productively, sharpening communication and decisions.",
+    "venus_square_pluto": "Venus square Pluto: Intense desires transform relationships, creating powerful attractions and deep connections.",
+    "mars_trine_saturn": "Mars trine Saturn: Disciplined action and patient effort combine effectively for lasting achievement."
+  },
+
+  "solar_sets": {
+    "aries_solar_set": "Aries Solar Set: Leadership and initiative define your creative self-expression. Bold action characterizes your approach to life.",
+    "taurus_solar_set": "Taurus Solar Set: Stability and beauty inform your creative path. Practical artistry defines your self-expression.",
+    "gemini_solar_set": "Gemini Solar Set: Intellectual versatility shapes your creative expression. Communication is your artistic medium.",
+    "cancer_solar_set": "Cancer Solar Set: Emotional depth and nurturing define your creative self. Family and home inspire your expression.",
+    "leo_solar_set": "Leo Solar Set: Dramatic self-expression and creative joy are your birthright. Confidence radiates from your core.",
+    "virgo_solar_set": "Virgo Solar Set: Craftsmanship and service shape your creative contribution. Perfecting skills is your art.",
+    "libra_solar_set": "Libra Solar Set: Harmony and beauty guide your creative expression. Relationship is your canvas.",
+    "scorpio_solar_set": "Scorpio Solar Set: Transformative intensity defines your creative power. Depth and passion fuel your expression.",
+    "sagittarius_solar_set": "Sagittarius Solar Set: Philosophical optimism shapes your creative vision. Expansion drives your self-expression.",
+    "capricorn_solar_set": "Capricorn Solar Set: Ambitious structure informs your creative mastery. Achievement through discipline defines you.",
+    "aquarius_solar_set": "Aquarius Solar Set: Innovative uniqueness characterizes your creative expression. Progressive ideals shape your path.",
+    "pisces_solar_set": "Pisces Solar Set: Imaginative compassion defines your creative spirit. Universal connection inspires your expression."
+  },
+
+  "general": {
+    "interpretation_unavailable": "Detailed interpretation for this placement is not yet available.",
+    "coming_soon": "More detailed interpretations coming soon."
+  }
+}
