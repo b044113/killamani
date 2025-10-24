@@ -9,13 +9,13 @@ from pathlib import Path
 
 try:
     from kerykeion import AstrologicalSubject, KerykeionChartSVG
-    from kerykeion.aspects import NatalAspects
+    from kerykeion.aspects import AspectsFactory
     KERYKEION_AVAILABLE = True
 except ImportError:
     KERYKEION_AVAILABLE = False
     AstrologicalSubject = None
     KerykeionChartSVG = None
-    NatalAspects = None
+    AspectsFactory = None
 
 from ...domain.value_objects.birth_data import BirthData
 from ...domain.exceptions import CalculationError
@@ -49,6 +49,18 @@ class KerykeionCalculator(IAstrologicalCalculator):
             "sesquiquadrate": settings.ORB_SESQUIQUADRATE,
             "quincunx": settings.ORB_QUINCUNX,
         }
+        # House system mapping: name -> Swiss Ephemeris letter code
+        self.house_system_map = {
+            "placidus": "P",
+            "koch": "K",
+            "equal": "A",
+            "whole_sign": "W",
+            "campanus": "C",
+            "regiomontanus": "R",
+            "topocentric": "T",
+            "porphyry": "O",
+            "morinus": "M",
+        }
 
     def calculate_natal_chart(
         self,
@@ -60,6 +72,9 @@ class KerykeionCalculator(IAstrologicalCalculator):
         """Calculate natal chart using Kerykeion."""
         try:
             # Create astrological subject
+            house_system_code = self.house_system_map.get(
+                settings.DEFAULT_HOUSE_SYSTEM.lower(), "P"
+            )
             subject = AstrologicalSubject(
                 name="Chart",
                 year=birth_data.date.year,
@@ -74,7 +89,7 @@ class KerykeionCalculator(IAstrologicalCalculator):
                 tz_str=birth_data.timezone,
                 zodiac_type="Tropic",
                 sidereal_mode=None,
-                house_system=settings.DEFAULT_HOUSE_SYSTEM.capitalize(),
+                houses_system_identifier=house_system_code,
             )
 
             # Extract planet positions
@@ -84,8 +99,8 @@ class KerykeionCalculator(IAstrologicalCalculator):
             houses = self._extract_houses(subject)
 
             # Calculate aspects
-            natal_aspects = NatalAspects(subject)
-            aspects = self._extract_aspects(natal_aspects)
+            aspects_model = AspectsFactory.single_chart_aspects(subject.model())
+            aspects = self._extract_aspects(aspects_model.all_aspects)
 
             # Extract angles
             angles = self._extract_angles(subject)
@@ -201,16 +216,169 @@ class KerykeionCalculator(IAstrologicalCalculator):
         output_path: str,
         language: str = "en"
     ) -> str:
-        """Generate SVG representation of chart."""
+        """Generate SVG representation of chart and save to file."""
         try:
-            # TODO: Implement SVG export using KerykeionChartSVG
-            # This requires reconstructing an AstrologicalSubject from chart_data
+            # Extract birth data from metadata if available
+            metadata = chart_data.get("metadata", {})
+
+            # This is a simplified implementation
+            # In a full implementation, we would reconstruct the AstrologicalSubject
+            # from chart_data and use KerykeionChartSVG
 
             output_file = Path(output_path) / f"chart_{datetime.utcnow().timestamp()}.svg"
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+
+            # For now, create a basic SVG placeholder
+            # TODO: Implement full SVG generation using KerykeionChartSVG
+            svg_content = self._generate_basic_svg(chart_data)
+            output_file.write_text(svg_content)
+
             return str(output_file)
 
         except Exception as e:
             raise CalculationError(f"Failed to export chart SVG: {str(e)}", "export")
+
+    def generate_chart_svg(
+        self,
+        birth_data: BirthData,
+        chart_data: Dict[str, Any],
+        chart_name: str = "Chart",
+        language: str = "en"
+    ) -> str:
+        """Generate SVG representation of chart and return as string."""
+        try:
+            # Create astrological subject from birth data
+            house_system_code = self.house_system_map.get(
+                settings.DEFAULT_HOUSE_SYSTEM.lower(), "P"
+            )
+            subject = AstrologicalSubject(
+                name=chart_name,
+                year=birth_data.date.year,
+                month=birth_data.date.month,
+                day=birth_data.date.day,
+                hour=birth_data.date.hour,
+                minute=birth_data.date.minute,
+                city=birth_data.city,
+                nation=birth_data.country,
+                lat=birth_data.latitude,
+                lng=birth_data.longitude,
+                tz_str=birth_data.timezone,
+                zodiac_type="Tropic",
+                sidereal_mode=None,
+                houses_system_identifier=house_system_code,
+            )
+
+            # Generate SVG using KerykeionChartSVG
+            lang_upper = language.upper() if language.upper() in ["EN", "ES", "IT", "FR", "DE", "PT"] else "EN"
+            chart_svg = KerykeionChartSVG(
+                subject,
+                chart_type="Natal",
+                chart_language=lang_upper,
+            )
+
+            # KerykeionChartSVG.makeSVG() generates a file and doesn't return content
+            # We need to call it and then read the generated file
+            chart_svg.makeSVG()
+
+            # The SVG file is saved in the chart_svg output_directory
+            # Kerykeion uses the subject's name with " - " separator
+            # Example: "John Doe - Natal Chart.svg"
+            svg_file_path = Path(chart_svg.output_directory) / f"{chart_name} - Natal Chart.svg"
+
+            if svg_file_path.exists():
+                svg_content = svg_file_path.read_text(encoding='utf-8')
+                # Clean up the generated file
+                svg_file_path.unlink()
+                return svg_content
+            else:
+                # If file not found, fall back to basic SVG
+                raise Exception(f"SVG file not generated at {svg_file_path}")
+
+        except Exception as e:
+            # If Kerykeion fails, return a basic SVG
+            print(f"[ERROR] Failed to generate Kerykeion SVG: {str(e)}")
+            print(f"[ERROR] Exception type: {type(e).__name__}")
+            import traceback
+            traceback.print_exc()
+            return self._generate_basic_svg(chart_data, chart_name)
+
+    def _generate_basic_svg(
+        self,
+        chart_data: Dict[str, Any],
+        chart_name: str = "Natal Chart"
+    ) -> str:
+        """
+        Generate a basic SVG representation when full generation fails.
+
+        This provides a fallback SVG with planet positions and basic chart info.
+        """
+        planets = chart_data.get("planets", [])
+        houses = chart_data.get("houses", [])
+        angles = chart_data.get("angles", {})
+
+        # Extract key information
+        sun = next((p for p in planets if p["name"] == "Sun"), None)
+        moon = next((p for p in planets if p["name"] == "Moon"), None)
+        ascendant = angles.get("ascendant", {})
+
+        svg = f'''<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" width="800" height="900">
+  <style>
+    .title {{ font: bold 24px sans-serif; fill: #333; }}
+    .subtitle {{ font: 16px sans-serif; fill: #666; }}
+    .planet {{ font: 14px sans-serif; fill: #444; }}
+    .degree {{ font: 12px sans-serif; fill: #888; }}
+    .circle {{ fill: none; stroke: #ddd; stroke-width: 2; }}
+    .zodiac {{ fill: none; stroke: #aaa; stroke-width: 1; }}
+  </style>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" class="title">{chart_name}</text>
+  <text x="400" y="65" text-anchor="middle" class="subtitle">Natal Chart</text>
+
+  <!-- Main Chart Circle -->
+  <circle cx="400" cy="450" r="280" class="circle"/>
+  <circle cx="400" cy="450" r="240" class="zodiac"/>
+  <circle cx="400" cy="450" r="200" class="zodiac"/>
+
+  <!-- Zodiac Wheel (12 houses) -->'''
+
+        # Draw 12 house divisions
+        for i in range(12):
+            angle = i * 30
+            x1 = 400 + 200 * __import__('math').cos(__import__('math').radians(angle - 90))
+            y1 = 450 + 200 * __import__('math').sin(__import__('math').radians(angle - 90))
+            x2 = 400 + 280 * __import__('math').cos(__import__('math').radians(angle - 90))
+            y2 = 450 + 280 * __import__('math').sin(__import__('math').radians(angle - 90))
+            svg += f'\n  <line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" class="zodiac"/>'
+
+        svg += '\n\n  <!-- Planet Positions -->'
+        y_offset = 100
+        for i, planet in enumerate(planets[:10]):  # First 10 planets
+            y = y_offset + (i * 25)
+            name = planet.get("name", "Unknown")
+            sign = planet.get("sign", "")
+            degree = planet.get("degree", 0)
+            house = planet.get("house", 0)
+            retrograde = " ℞" if planet.get("is_retrograde", False) else ""
+
+            svg += f'''
+  <text x="50" y="{y}" class="planet">{name}{retrograde}</text>
+  <text x="200" y="{y}" class="degree">{sign} {degree:.2f}° (House {house})</text>'''
+
+        # Add Ascendant info
+        if ascendant:
+            asc_sign = ascendant.get("sign", "")
+            asc_degree = ascendant.get("degree", 0)
+            svg += f'''
+
+  <!-- Angles -->
+  <text x="50" y="{y_offset + 275}" class="planet">Ascendant</text>
+  <text x="200" y="{y_offset + 275}" class="degree">{asc_sign} {asc_degree:.2f}°</text>'''
+
+        svg += '\n</svg>'
+
+        return svg
 
     def get_supported_aspects(self) -> List[str]:
         """Get list of supported aspects."""
@@ -260,18 +428,38 @@ class KerykeionCalculator(IAstrologicalCalculator):
 
         for planet_name in planet_names:
             if hasattr(subject, planet_name):
-                planet_data = getattr(subject, planet_name)
+                planet_obj = getattr(subject, planet_name)
+                if planet_obj is None:
+                    continue
+
+                # Extract degree, minute, second from position
+                position = getattr(planet_obj, 'position', 0.0)
+                degree = int(position % 30)
+                minute = int((position % 1) * 60)
+                second = int(((position % 1) * 60 % 1) * 60)
+
+                # Extract house number from house string (e.g., "Ninth_House" -> 9)
+                house_str = getattr(planet_obj, 'house', '')
+                house_num = 1
+                house_map = {
+                    'First_House': 1, 'Second_House': 2, 'Third_House': 3,
+                    'Fourth_House': 4, 'Fifth_House': 5, 'Sixth_House': 6,
+                    'Seventh_House': 7, 'Eighth_House': 8, 'Ninth_House': 9,
+                    'Tenth_House': 10, 'Eleventh_House': 11, 'Twelfth_House': 12
+                }
+                house_num = house_map.get(house_str, 1)
+
                 planets.append({
                     "name": planet_name.replace("_", " ").title(),
-                    "longitude": planet_data.get("position", 0.0),
-                    "latitude": planet_data.get("latitude", 0.0),
-                    "speed": planet_data.get("speed", 0.0),
-                    "sign": planet_data.get("sign", ""),
-                    "degree": planet_data.get("pos_degree", 0.0),
-                    "minute": int(planet_data.get("pos_minute", 0)),
-                    "second": int(planet_data.get("pos_second", 0)),
-                    "house": planet_data.get("house", 1),
-                    "is_retrograde": planet_data.get("retrograde", False),
+                    "longitude": position,
+                    "latitude": 0.0,  # Not provided in kerykeion 5.x
+                    "speed": getattr(planet_obj, 'speed', 0.0),
+                    "sign": getattr(planet_obj, 'sign', ''),
+                    "degree": degree,
+                    "minute": minute,
+                    "second": second,
+                    "house": house_num,
+                    "is_retrograde": getattr(planet_obj, 'retrograde', False),
                 })
 
         return planets
@@ -280,33 +468,46 @@ class KerykeionCalculator(IAstrologicalCalculator):
         """Extract house positions from Kerykeion subject."""
         houses = []
 
-        for i in range(1, 13):
-            house_attr = f"first_house" if i == 1 else f"house{i}"
-            if hasattr(subject, house_attr):
-                house_data = getattr(subject, house_attr)
+        house_names = [
+            "first_house", "second_house", "third_house", "fourth_house",
+            "fifth_house", "sixth_house", "seventh_house", "eighth_house",
+            "ninth_house", "tenth_house", "eleventh_house", "twelfth_house"
+        ]
+
+        for i, house_name in enumerate(house_names, start=1):
+            if hasattr(subject, house_name):
+                house_obj = getattr(subject, house_name)
+                if house_obj is None:
+                    continue
+
+                position = getattr(house_obj, 'position', 0.0)
+                degree = int(position % 30)
+
                 houses.append({
                     "number": i,
-                    "cusp_longitude": house_data.get("position", 0.0),
-                    "sign": house_data.get("sign", ""),
-                    "degree": house_data.get("pos_degree", 0.0),
+                    "cusp_longitude": position,
+                    "sign": getattr(house_obj, 'sign', ''),
+                    "degree": degree,
                 })
 
         return houses
 
-    def _extract_aspects(self, natal_aspects: NatalAspects) -> List[Dict[str, Any]]:
-        """Extract aspects from Kerykeion NatalAspects."""
+    def _extract_aspects(self, aspects_list: List) -> List[Dict[str, Any]]:
+        """Extract aspects from Kerykeion AspectsFactory result."""
         aspects = []
 
-        if hasattr(natal_aspects, "all_aspects"):
-            for aspect in natal_aspects.all_aspects:
-                aspects.append({
-                    "planet1": aspect.get("p1_name", ""),
-                    "planet2": aspect.get("p2_name", ""),
-                    "aspect_type": aspect.get("aspect", "").lower(),
-                    "angle": aspect.get("orbit", 0.0),
-                    "orb": abs(aspect.get("orbit", 0.0) - aspect.get("aspect_degrees", 0.0)),
-                    "is_applying": aspect.get("aid", 0) > 0,
-                })
+        for aspect in aspects_list:
+            # Check if applying or separating
+            is_applying = getattr(aspect, 'aspect_movement', '') == 'Applying'
+
+            aspects.append({
+                "planet1": getattr(aspect, 'p1_name', ''),
+                "planet2": getattr(aspect, 'p2_name', ''),
+                "aspect_type": getattr(aspect, 'aspect', '').lower(),
+                "angle": getattr(aspect, 'aspect_degrees', 0.0),
+                "orb": abs(getattr(aspect, 'orbit', 0.0)),
+                "is_applying": is_applying,
+            })
 
         return aspects
 
@@ -314,18 +515,20 @@ class KerykeionCalculator(IAstrologicalCalculator):
         """Extract chart angles (ASC, MC, etc.) from Kerykeion subject."""
         angles = {}
 
-        if hasattr(subject, "first_house"):
+        if hasattr(subject, "first_house") and subject.first_house:
+            position = getattr(subject.first_house, 'position', 0.0)
             angles["ascendant"] = {
-                "longitude": subject.first_house.get("position", 0.0),
-                "sign": subject.first_house.get("sign", ""),
-                "degree": subject.first_house.get("pos_degree", 0.0),
+                "longitude": position,
+                "sign": getattr(subject.first_house, 'sign', ''),
+                "degree": int(position % 30),
             }
 
-        if hasattr(subject, "tenth_house"):
+        if hasattr(subject, "tenth_house") and subject.tenth_house:
+            position = getattr(subject.tenth_house, 'position', 0.0)
             angles["midheaven"] = {
-                "longitude": subject.tenth_house.get("position", 0.0),
-                "sign": subject.tenth_house.get("sign", ""),
-                "degree": subject.tenth_house.get("pos_degree", 0.0),
+                "longitude": position,
+                "sign": getattr(subject.tenth_house, 'sign', ''),
+                "degree": int(position % 30),
             }
 
         return angles

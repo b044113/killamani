@@ -1,0 +1,13 @@
+{
+  "name": "Maria Rodriguez",
+  "birth_date": "1985-12-25",
+  "birth_time": "10:45",
+  "birth_city": "Buenos Aires",
+  "birth_country": "AR",
+  "birth_timezone": "America/Argentina/Buenos_Aires",
+  "include_chiron": true,
+  "include_lilith": true,
+  "include_nodes": true,
+  "house_system": "placidus",
+  "language": "en"
+}

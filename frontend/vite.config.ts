@@ -15,10 +15,15 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0', // Listen on all network interfaces (required for Docker)
     port: 3000,
+    strictPort: true,
+    watch: {
+      usePolling: true, // Required for hot reload in Docker on Windows
+    },
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://backend:8000', // Use Docker service name
         changeOrigin: true,
       },
     },

@@ -124,10 +124,29 @@ class IAstrologicalCalculator(ABC):
         language: str = "en"
     ) -> str:
         """
-        Generate SVG representation of chart.
+        Generate SVG representation of chart and save to file.
 
         Returns:
             Path to generated SVG file
+        """
+        pass
+
+    @abstractmethod
+    def generate_chart_svg(
+        self,
+        birth_data: BirthData,
+        chart_data: Dict[str, Any],
+        chart_name: str = "Chart",
+        language: str = "en"
+    ) -> str:
+        """
+        Generate SVG representation of chart and return as string.
+
+        This method generates the SVG in-memory without saving to file,
+        useful for quick chart calculations that don't require persistence.
+
+        Returns:
+            SVG content as string
         """
         pass
 

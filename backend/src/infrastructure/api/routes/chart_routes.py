@@ -11,19 +11,64 @@ from ....application.dtos.chart_dtos import (
     CalculateNatalChartDTO,
     NatalChartDTO,
 )
+from ....application.dtos.quick_chart_dtos import (
+    QuickCalculateChartDTO,
+    QuickChartResultDTO,
+)
 from ....application.use_cases.chart_calculation import (
     CalculateNatalChartUseCase,
     GetChartDetailsUseCase,
     ListClientChartsUseCase,
+)
+from ....application.use_cases.chart_calculation.quick_calculate_chart_use_case import (
+    QuickCalculateChartUseCase,
 )
 from ..dependencies.dependencies import (
     get_current_user,
     get_calculate_natal_chart_use_case,
     get_chart_details_use_case,
     get_list_client_charts_use_case,
+    get_quick_calculate_chart_use_case,
 )
 
 router = APIRouter()
+
+
+@router.post("/quick-calculate", status_code=status.HTTP_200_OK)
+async def quick_calculate_chart(
+    chart_data: QuickCalculateChartDTO,
+    use_case: QuickCalculateChartUseCase = Depends(get_quick_calculate_chart_use_case)
+):
+    """
+    Calculate natal chart without requiring client creation (MVP feature).
+
+    This endpoint allows any user (admin, consultant, or anonymous) to calculate
+    a natal chart by providing birth data directly. The chart is not persisted
+    to the database and is returned immediately with SVG visualization.
+
+    **No authentication required** - this is a public endpoint for the MVP.
+
+    Request body:
+    - name: Person's name for the chart
+    - birth_date: Birth date in YYYY-MM-DD format
+    - birth_time: Birth time in HH:MM format
+    - birth_city: City of birth
+    - birth_country: Country ISO code (e.g., "US", "AR")
+    - birth_timezone: IANA timezone (e.g., "America/New_York")
+    - birth_latitude: (optional) Manual latitude
+    - birth_longitude: (optional) Manual longitude
+    - include_chiron: (optional, default: true)
+    - include_lilith: (optional, default: true)
+    - include_nodes: (optional, default: true)
+    - house_system: (optional, default: "placidus")
+    - language: (optional, default: "en")
+
+    Returns:
+    - Calculated chart with planets, houses, aspects, and SVG visualization
+    """
+    print(f"[DEBUG] Received chart_data: {chart_data}")
+    result = use_case.execute(chart_data)
+    return result.to_dict()
 
 
 @router.post("/natal", response_model=NatalChartDTO, status_code=status.HTTP_201_CREATED)

@@ -38,8 +38,15 @@ RUN pip install --no-cache-dir -r requirements-dev.txt
 # Copy source code
 COPY . .
 
+# Install PostgreSQL client for database checks
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+
 # Create storage directory
 RUN mkdir -p /app/storage /app/logs
+
+# Copy and set permissions for entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Set Python path
 ENV PYTHONPATH=/app
@@ -47,6 +54,9 @@ ENV PYTHONUNBUFFERED=1
 
 # Expose port
 EXPOSE 8000
+
+# Set entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
 
 # Default command (can be overridden in docker-compose)
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

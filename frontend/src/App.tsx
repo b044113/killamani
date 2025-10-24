@@ -17,6 +17,7 @@ import { Dashboard } from './features/dashboard/components/Dashboard';
 import { ClientList } from './features/clients/components/ClientList';
 import { ChartList } from './features/charts/components/ChartList';
 import { Settings } from './features/settings/components/Settings';
+import { QuickChartCalculator } from './features/charts/components/QuickChartCalculator';
 
 // Create theme
 const theme = createTheme({
@@ -66,6 +67,7 @@ export const App: React.FC = () => {
             {/* Public routes */}
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<div>Register (TODO)</div>} />
+            <Route path="/quick-chart" element={<QuickChartCalculator />} />
 
             {/* Protected routes */}
             <Route

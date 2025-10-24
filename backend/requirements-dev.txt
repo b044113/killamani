@@ -24,6 +24,7 @@ mkdocs-material==9.5.50
 # Debugging
 ipython==8.32.0
 ipdb==0.13.13
+debugpy==1.8.11  # VS Code remote debugging
 
 # Performance
 locust==2.42.0  # Load testing
