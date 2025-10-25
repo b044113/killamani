@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { clientService } from './clientService'
 import { apiClient } from '@/shared/utils/apiClient'
-import { mockClient, mockClients, mockApiResponses } from '@/test/mocks/mockData'
+import { mockClient, mockClients } from '@/test/mocks/mockData'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { clientService } from './clientService'
 
 // Mock the apiClient
 vi.mock('@/shared/utils/apiClient', () => ({
@@ -35,7 +35,7 @@ describe('clientService', () => {
       const result = await clientService.getClients()
 
       // Assert
-      expect(apiClient.get).toHaveBeenCalledWith('/clients', { params: undefined })
+      expect(apiClient.get).toHaveBeenCalledWith('/api/clients', { params: undefined })
       expect(result.items).toEqual(mockClients)
       expect(result.total).toBe(mockClients.length)
     })
@@ -57,7 +57,7 @@ describe('clientService', () => {
       const result = await clientService.getClients(params)
 
       // Assert
-      expect(apiClient.get).toHaveBeenCalledWith('/clients', { params })
+      expect(apiClient.get).toHaveBeenCalledWith('/api/clients', { params })
       expect(result.items).toHaveLength(1)
     })
 
@@ -81,7 +81,7 @@ describe('clientService', () => {
       const result = await clientService.getClient(mockClient.id)
 
       // Assert
-      expect(apiClient.get).toHaveBeenCalledWith(`/clients/${mockClient.id}`)
+      expect(apiClient.get).toHaveBeenCalledWith(`/api/clients/${mockClient.id}`)
       expect(result).toEqual(mockClient)
     })
 
@@ -122,7 +122,7 @@ describe('clientService', () => {
       const result = await clientService.createClient(newClientData)
 
       // Assert
-      expect(apiClient.post).toHaveBeenCalledWith('/clients', newClientData)
+      expect(apiClient.post).toHaveBeenCalledWith('/api/clients', newClientData)
       expect(result.name).toBe(newClientData.name)
       expect(result.birthPlace).toBe(newClientData.birthPlace)
     })
@@ -165,7 +165,7 @@ describe('clientService', () => {
       const result = await clientService.updateClient(mockClient.id, updateData)
 
       // Assert
-      expect(apiClient.put).toHaveBeenCalledWith(`/clients/${mockClient.id}`, updateData)
+      expect(apiClient.put).toHaveBeenCalledWith(`/api/clients/${mockClient.id}`, updateData)
       expect(result.name).toBe(updateData.name)
       expect(result.notes).toBe(updateData.notes)
     })
@@ -192,7 +192,7 @@ describe('clientService', () => {
       await clientService.deleteClient(mockClient.id)
 
       // Assert
-      expect(apiClient.delete).toHaveBeenCalledWith(`/clients/${mockClient.id}`)
+      expect(apiClient.delete).toHaveBeenCalledWith(`/api/clients/${mockClient.id}`)
     })
 
     it('should throw error when deletion fails', async () => {

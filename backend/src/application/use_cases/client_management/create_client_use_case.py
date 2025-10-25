@@ -29,10 +29,12 @@ class CreateClientUseCase:
 
     def execute(self, dto: CreateClientDTO, current_user: User) -> ClientDTO:
         """
-        Execute client creation.
+        Execute client creation (basic information only).
+
+        Birth charts are now added separately after client creation.
 
         Args:
-            dto: Client creation data
+            dto: Client creation data (basic information)
             current_user: User performing the action
 
         Returns:
@@ -46,26 +48,14 @@ class CreateClientUseCase:
         if not current_user.can_manage_clients():
             raise UnauthorizedAccessError("Only consultants can create clients")
 
-        # Create birth data value object
-        try:
-            birth_data = BirthData(
-                date=dto.birth_data.date,
-                city=dto.birth_data.city,
-                country=dto.birth_data.country,
-                timezone=dto.birth_data.timezone,
-                latitude=dto.birth_data.latitude,
-                longitude=dto.birth_data.longitude,
-            )
-        except ValueError as e:
-            raise ValidationError(f"Invalid birth data: {str(e)}")
-
-        # Create client entity
+        # Create client entity (without birth data)
         client = Client(
             consultant_id=current_user.id,
             first_name=dto.first_name,
             last_name=dto.last_name,
             email=dto.email,
-            birth_data=birth_data,
+            phone=dto.phone,
+            birth_data=None,  # Charts are added separately
             notes=dto.notes or "",
         )
 

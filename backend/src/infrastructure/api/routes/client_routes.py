@@ -14,12 +14,19 @@ from ....application.dtos.client_dtos import (
     ClientDTO,
     ClientListDTO,
 )
+from ....application.dtos.chart_dtos import (
+    CreateChartForClientDTO,
+    NatalChartDTO,
+)
 from ....application.use_cases.client_management import (
     CreateClientUseCase,
     ListClientsUseCase,
     GetClientDetailsUseCase,
     UpdateClientUseCase,
     SearchClientsUseCase,
+)
+from ....application.use_cases.chart_calculation.create_chart_for_client_use_case import (
+    CreateChartForClientUseCase,
 )
 from ..dependencies.dependencies import (
     get_current_user,
@@ -28,12 +35,13 @@ from ..dependencies.dependencies import (
     get_client_details_use_case,
     get_update_client_use_case,
     get_search_clients_use_case,
+    get_create_chart_for_client_use_case,
 )
 
 router = APIRouter()
 
 
-@router.post("/", response_model=ClientDTO, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ClientDTO, status_code=status.HTTP_201_CREATED)
 async def create_client(
     client_data: CreateClientDTO,
     current_user: User = Depends(get_current_user),
@@ -75,6 +83,7 @@ async def search_clients(
 
     Returns matching clients based on user permissions.
     """
+    # Pydantic DTO will validate the parameters
     search_dto = SearchClientsDTO(query=query, skip=skip, limit=limit)
     return use_case.execute(search_dto, current_user)
 
@@ -123,3 +132,19 @@ async def delete_client(
     """
     # TODO: Implement delete client use case
     return None
+
+
+@router.post("/{client_id}/charts", response_model=NatalChartDTO, status_code=status.HTTP_201_CREATED)
+async def create_chart_for_client(
+    client_id: str,
+    chart_data: CreateChartForClientDTO,
+    current_user: User = Depends(get_current_user),
+    use_case: CreateChartForClientUseCase = Depends(get_create_chart_for_client_use_case)
+):
+    """
+    Create a new natal chart for an existing client.
+
+    This allows adding multiple charts to a client (e.g., birth chart, rectified chart).
+    User must have permission to add charts to this client.
+    """
+    return use_case.execute(client_id, chart_data, current_user)

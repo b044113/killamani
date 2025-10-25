@@ -3,7 +3,7 @@
  *
  * Custom hook for managing client data with React Query
  */
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { clientService } from '../services/clientService';
 import type { CreateClientDTO } from '../types';
 
@@ -12,7 +12,7 @@ const QUERY_KEY = 'clients';
 /**
  * Hook to fetch all clients
  */
-export const useClients = (params?: { page?: number; pageSize?: number; search?: string }) => {
+export const useClients = (params?: { skip?: number; limit?: number }) => {
   return useQuery({
     queryKey: [QUERY_KEY, params],
     queryFn: () => clientService.getClients(params),

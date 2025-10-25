@@ -36,12 +36,22 @@ class SQLAlchemyClientRepository(IClientRepository):
                 existing.first_name = client.first_name
                 existing.last_name = client.last_name
                 existing.email = client.email
-                existing.birth_date = client.birth_data.date
-                existing.birth_city = client.birth_data.city
-                existing.birth_country = client.birth_data.country
-                existing.birth_timezone = client.birth_data.timezone
-                existing.birth_latitude = client.birth_data.latitude
-                existing.birth_longitude = client.birth_data.longitude
+                existing.phone = client.phone
+                # Handle optional birth_data
+                if client.birth_data:
+                    existing.birth_date = client.birth_data.date
+                    existing.birth_city = client.birth_data.city
+                    existing.birth_country = client.birth_data.country
+                    existing.birth_timezone = client.birth_data.timezone
+                    existing.birth_latitude = client.birth_data.latitude
+                    existing.birth_longitude = client.birth_data.longitude
+                else:
+                    existing.birth_date = None
+                    existing.birth_city = None
+                    existing.birth_country = None
+                    existing.birth_timezone = None
+                    existing.birth_latitude = None
+                    existing.birth_longitude = None
                 existing.notes = client.notes
                 existing.updated_at = client.updated_at
                 db_client = existing

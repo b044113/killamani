@@ -62,12 +62,13 @@ class ClientModel(Base):
     first_name = Column(String(100), nullable=False)
     last_name = Column(String(100), nullable=False)
     email = Column(String(255), nullable=True)
+    phone = Column(String(50), nullable=True)
 
-    # Birth Data (stored as JSON for flexibility)
-    birth_date = Column(DateTime, nullable=False)
-    birth_city = Column(String(100), nullable=False)
-    birth_country = Column(String(10), nullable=False)
-    birth_timezone = Column(String(50), nullable=False)
+    # Birth Data (now optional - charts are stored separately)
+    birth_date = Column(DateTime, nullable=True)
+    birth_city = Column(String(100), nullable=True)
+    birth_country = Column(String(10), nullable=True)
+    birth_timezone = Column(String(50), nullable=True)
     birth_latitude = Column(Float, nullable=True)
     birth_longitude = Column(Float, nullable=True)
 
@@ -97,6 +98,9 @@ class NatalChartModel(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     client_id = Column(UUID(as_uuid=True), ForeignKey("clients.id"), nullable=False, index=True)
+
+    # Chart Information
+    name = Column(String(200), default="Birth Chart", nullable=False)
 
     # Chart Data (stored as JSON)
     data = Column(JSON, nullable=False)

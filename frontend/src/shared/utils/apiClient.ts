@@ -1,10 +1,10 @@
 /**
  * API Client
  *
- * Axios instance configured for the AstroJoy API
+ * Axios instance configured for the Killamani
  */
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import type { ApiError } from '@/types';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 

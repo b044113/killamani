@@ -1,5 +1,5 @@
 """
-AstroJoy Platform - FastAPI Application
+Killamani Platform - FastAPI Application
 
 Main application entry point with all routes and middleware configured.
 """
@@ -23,12 +23,12 @@ settings = get_settings()
 
 # Create FastAPI application
 app = FastAPI(
-    title="AstroJoy API",
+    title="Killamani API",
     description="Professional Astrology Platform API with Hexagonal Architecture",
     version="1.0.0",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
-    openapi_url="/api/openapi.json",
+    openapi_url="/api/openapi.json"
 )
 
 # ============================================================================
@@ -106,7 +106,7 @@ async def root():
     Returns API information.
     """
     return {
-        "name": "AstroJoy API",
+        "name": "Killamani API",
         "version": "1.0.0",
         "docs": "/api/docs",
         "health": "/health",
@@ -122,7 +122,7 @@ async def startup_event():
     """
     Actions to perform on application startup.
     """
-    print("[STARTUP] AstroJoy API starting...")
+    print("[STARTUP] Killamani API starting...")
     print(f"[INFO] Environment: {settings.ENVIRONMENT}")
     print(f"[INFO] Database: {settings.DATABASE_URL.split('@')[1] if '@' in settings.DATABASE_URL else 'configured'}")
     print(f"[INFO] CORS Origins: {settings.CORS_ORIGINS}")
@@ -134,7 +134,7 @@ async def shutdown_event():
     """
     Actions to perform on application shutdown.
     """
-    print("👋 AstroJoy API shutting down...")
+    print("👋 Killamani API shutting down...")
 
 
 # ============================================================================

@@ -54,8 +54,8 @@ class UpdateClientUseCase:
         if dto.last_name is not None:
             client.last_name = dto.last_name
 
-        if dto.email is not None:
-            client.update_contact_info(email=dto.email)
+        if dto.email is not None or dto.phone is not None:
+            client.update_contact_info(email=dto.email, phone=dto.phone)
 
         if dto.notes is not None:
             client.update_notes(dto.notes)

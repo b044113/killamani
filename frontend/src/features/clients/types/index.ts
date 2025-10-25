@@ -4,20 +4,22 @@
 
 export interface Client {
   id: string;
-  userId: string;
+  userId?: string;
+  consultantId: string;
   firstName: string;
   lastName: string;
+  fullName: string;
   email?: string;
   phone?: string;
-  birthDate: string; // ISO date string
-  birthTime: string; // HH:MM format
-  birthPlace: string;
-  latitude: number;
-  longitude: number;
-  timezone: string;
+  // Birth data is now optional - charts are stored separately
+  birthDate?: string; // ISO date string
+  birthCity?: string;
+  birthCountry?: string;
+  birthTimezone?: string;
   notes?: string;
   createdAt: string;
   updatedAt: string;
+  hasAccount: boolean;
 }
 
 export interface CreateClientDTO {
@@ -25,12 +27,6 @@ export interface CreateClientDTO {
   lastName: string;
   email?: string;
   phone?: string;
-  birthDate: string;
-  birthTime: string;
-  birthPlace: string;
-  latitude: number;
-  longitude: number;
-  timezone: string;
   notes?: string;
 }
 
@@ -41,6 +37,6 @@ export interface UpdateClientDTO extends Partial<CreateClientDTO> {
 export interface ClientListResponse {
   clients: Client[];
   total: number;
-  page: number;
-  pageSize: number;
+  skip: number;
+  limit: number;
 }

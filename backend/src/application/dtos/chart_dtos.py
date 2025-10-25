@@ -2,70 +2,120 @@
 Chart DTOs (Data Transfer Objects)
 
 Input/Output data structures for chart calculation use cases.
+All DTOs use Pydantic with camelCase aliases for frontend compatibility.
 """
-from dataclasses import dataclass
 from typing import Optional, Dict, List
 from datetime import datetime
+from pydantic import BaseModel, Field
 
 
 # ============================================================================
 # Input DTOs
 # ============================================================================
 
-@dataclass
-class CalculateNatalChartDTO:
-    """Data required to calculate a natal chart."""
-    client_id: str
+class CreateChartForClientDTO(BaseModel):
+    """
+    Data required to create a natal chart for an existing client.
+
+    Similar to QuickCalculateChartDTO but saves the chart to the database
+    and associates it with a client.
+    """
+    name: str = Field(..., description="Name for this chart (e.g., 'Birth Chart', 'Rectified Chart')")
+    birth_date: str = Field(..., description="ISO format: YYYY-MM-DD")
+    birth_time: str = Field(..., description="HH:MM format: 14:30")
+    birth_city: str
+    birth_country: str = Field(..., description="ISO code: US, AR, etc.")
+    birth_timezone: str = Field(..., description="IANA timezone: America/New_York")
+    birth_latitude: Optional[float] = None
+    birth_longitude: Optional[float] = None
     include_chiron: bool = True
     include_lilith: bool = True
     include_nodes: bool = True
     house_system: str = "placidus"
     language: str = "en"
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "Birth Chart",
+                "birth_date": "1990-05-15",
+                "birth_time": "14:30",
+                "birth_city": "Buenos Aires",
+                "birth_country": "AR",
+                "birth_timezone": "America/Argentina/Buenos_Aires",
+                "include_chiron": True,
+                "include_lilith": True,
+                "include_nodes": True,
+                "house_system": "placidus",
+                "language": "en"
+            }
+        }
 
-@dataclass
-class CalculateTransitsDTO:
+
+class CalculateNatalChartDTO(BaseModel):
+    """Data required to calculate a natal chart."""
+    client_id: str = Field(..., alias='clientId')
+    include_chiron: bool = Field(True, alias='includeChiron')
+    include_lilith: bool = Field(True, alias='includeLilith')
+    include_nodes: bool = Field(True, alias='includeNodes')
+    house_system: str = Field("placidus", alias='houseSystem')
+    language: str = "en"
+
+    class Config:
+        populate_by_name = True
+
+
+class CalculateTransitsDTO(BaseModel):
     """Data required to calculate transits."""
-    client_id: str
-    natal_chart_id: str
-    target_date: datetime
+    client_id: str = Field(..., alias='clientId')
+    natal_chart_id: str = Field(..., alias='natalChartId')
+    target_date: datetime = Field(..., alias='targetDate')
     language: str = "en"
 
+    class Config:
+        populate_by_name = True
 
-@dataclass
-class CalculateSolarReturnDTO:
+
+class CalculateSolarReturnDTO(BaseModel):
     """Data required to calculate solar return."""
-    client_id: str
-    natal_chart_id: str
-    return_year: int
-    location_city: str
-    location_country: str
-    location_latitude: Optional[float] = None
-    location_longitude: Optional[float] = None
+    client_id: str = Field(..., alias='clientId')
+    natal_chart_id: str = Field(..., alias='natalChartId')
+    return_year: int = Field(..., alias='returnYear')
+    location_city: str = Field(..., alias='locationCity')
+    location_country: str = Field(..., alias='locationCountry')
+    location_latitude: Optional[float] = Field(None, alias='locationLatitude')
+    location_longitude: Optional[float] = Field(None, alias='locationLongitude')
     language: str = "en"
+
+    class Config:
+        populate_by_name = True
 
 
 # ============================================================================
 # Output DTOs
 # ============================================================================
 
-@dataclass
-class NatalChartDTO:
+class NatalChartDTO(BaseModel):
     """Natal chart data returned to API consumers."""
     id: str
-    client_id: str
-    sun_sign: str
+    client_id: str = Field(..., alias='clientId')
+    name: str
+    sun_sign: str = Field(..., alias='sunSign')
     planets: List[Dict]
     houses: List[Dict]
     aspects: List[Dict]
     angles: Dict
-    solar_set: Dict
+    solar_set: Dict = Field(..., alias='solarSet')
     interpretations: Dict[str, str]
-    house_system: str
-    svg_url: Optional[str]
-    pdf_url: Optional[str]
-    calculated_at: datetime
-    created_at: datetime
+    house_system: str = Field(..., alias='houseSystem')
+    svg_url: Optional[str] = Field(None, alias='svgUrl')
+    pdf_url: Optional[str] = Field(None, alias='pdfUrl')
+    calculated_at: datetime = Field(..., alias='calculatedAt')
+    created_at: datetime = Field(..., alias='createdAt')
+
+    class Config:
+        populate_by_name = True
+        by_alias = True
 
     @classmethod
     def from_entity(cls, chart):
@@ -73,6 +123,7 @@ class NatalChartDTO:
         return cls(
             id=str(chart.id),
             client_id=str(chart.client_id),
+            name=chart.name,
             sun_sign=chart.sun_sign,
             planets=chart.get_planets(),
             houses=chart.get_houses(),
@@ -88,17 +139,20 @@ class NatalChartDTO:
         )
 
 
-@dataclass
-class TransitDTO:
+class TransitDTO(BaseModel):
     """Transit data returned to API consumers."""
     id: str
-    client_id: str
-    natal_chart_id: str
-    transit_date: datetime
-    significant_aspects: List[Dict]
-    active_transits: List[Dict]
+    client_id: str = Field(..., alias='clientId')
+    natal_chart_id: str = Field(..., alias='natalChartId')
+    transit_date: datetime = Field(..., alias='transitDate')
+    significant_aspects: List[Dict] = Field(..., alias='significantAspects')
+    active_transits: List[Dict] = Field(..., alias='activeTransits')
     interpretations: Dict[str, str]
-    calculated_at: datetime
+    calculated_at: datetime = Field(..., alias='calculatedAt')
+
+    class Config:
+        populate_by_name = True
+        by_alias = True
 
     @classmethod
     def from_entity(cls, transit):
@@ -115,26 +169,29 @@ class TransitDTO:
         )
 
 
-@dataclass
-class SolarReturnDTO:
+class SolarReturnDTO(BaseModel):
     """Solar return data returned to API consumers."""
     id: str
-    client_id: str
-    natal_chart_id: str
-    return_year: int
-    return_datetime: datetime
-    sun_sign: str
+    client_id: str = Field(..., alias='clientId')
+    natal_chart_id: str = Field(..., alias='natalChartId')
+    return_year: int = Field(..., alias='returnYear')
+    return_datetime: datetime = Field(..., alias='returnDatetime')
+    sun_sign: str = Field(..., alias='sunSign')
     planets: List[Dict]
     houses: List[Dict]
     aspects: List[Dict]
-    solar_set: Dict
+    solar_set: Dict = Field(..., alias='solarSet')
     interpretations: Dict[str, str]
-    location_city: str
-    location_country: str
-    is_relocated: bool
-    svg_url: Optional[str]
-    pdf_url: Optional[str]
-    calculated_at: datetime
+    location_city: str = Field(..., alias='locationCity')
+    location_country: str = Field(..., alias='locationCountry')
+    is_relocated: bool = Field(..., alias='isRelocated')
+    svg_url: Optional[str] = Field(None, alias='svgUrl')
+    pdf_url: Optional[str] = Field(None, alias='pdfUrl')
+    calculated_at: datetime = Field(..., alias='calculatedAt')
+
+    class Config:
+        populate_by_name = True
+        by_alias = True
 
     @classmethod
     def from_entity(cls, solar_return):

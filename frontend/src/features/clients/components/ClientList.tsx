@@ -3,13 +3,26 @@
  *
  * Displays list of clients with search, create, edit, and delete actions
  */
-import React, { useState } from 'react';
+import { ChartFormDialog } from '@/features/charts/components/ChartFormDialog';
+import { useTranslation } from '@/shared/hooks/useTranslation';
 import {
+  Add as AddIcon,
+  Description as ChartIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  Search as SearchIcon,
+} from '@mui/icons-material';
+import {
+  Alert,
   Box,
   Button,
   Card,
   CardContent,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   InputAdornment,
   Paper,
@@ -21,34 +34,25 @@ import {
   TableRow,
   TextField,
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Alert,
 } from '@mui/material';
-import {
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Search as SearchIcon,
-} from '@mui/icons-material';
-import { useTranslation } from '@/shared/hooks/useTranslation';
+import React, { useState } from 'react';
 import { useClients, useDeleteClient } from '../hooks/useClients';
-import { ClientForm } from './ClientForm';
 import type { Client } from '../types';
+import { ClientForm } from './ClientForm';
 
 export const ClientList: React.FC = () => {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
-  const [page] = useState(1);
-  const [pageSize] = useState(10);
+  const [skip] = useState(1);
+  const [limit] = useState(10);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
+  const [isChartFormOpen, setIsChartFormOpen] = useState(false);
+  const [chartFormClient, setChartFormClient] = useState<Client | null>(null);
 
-  const { data, isLoading, error } = useClients({ page, pageSize, search });
+  const { data, isLoading, error } = useClients({ skip, limit });
   const deleteClient = useDeleteClient();
 
   const handleCreateClick = () => {
@@ -77,6 +81,16 @@ export const ClientList: React.FC = () => {
   const handleFormClose = () => {
     setIsFormOpen(false);
     setSelectedClient(null);
+  };
+
+  const handleAddChartClick = (client: Client) => {
+    setChartFormClient(client);
+    setIsChartFormOpen(true);
+  };
+
+  const handleChartFormClose = () => {
+    setIsChartFormOpen(false);
+    setChartFormClient(null);
   };
 
   if (isLoading) {
@@ -155,9 +169,8 @@ export const ClientList: React.FC = () => {
                 <TableCell>{t('clients.firstName')}</TableCell>
                 <TableCell>{t('clients.lastName')}</TableCell>
                 <TableCell>{t('clients.email')}</TableCell>
-                <TableCell>{t('clients.birthDate')}</TableCell>
-                <TableCell>{t('clients.birthPlace')}</TableCell>
-                <TableCell align="right">{t('common.edit')}</TableCell>
+                <TableCell>{t('clients.phone')}</TableCell>
+                <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -166,15 +179,21 @@ export const ClientList: React.FC = () => {
                   <TableCell>{client.firstName}</TableCell>
                   <TableCell>{client.lastName}</TableCell>
                   <TableCell>{client.email || '-'}</TableCell>
-                  <TableCell>
-                    {new Date(client.birthDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>{client.birthPlace}</TableCell>
+                  <TableCell>{client.phone || '-'}</TableCell>
                   <TableCell align="right">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleAddChartClick(client)}
+                      color="secondary"
+                      title="Add Chart"
+                    >
+                      <ChartIcon />
+                    </IconButton>
                     <IconButton
                       size="small"
                       onClick={() => handleEditClick(client)}
                       color="primary"
+                      title="Edit Client"
                     >
                       <EditIcon />
                     </IconButton>
@@ -182,6 +201,7 @@ export const ClientList: React.FC = () => {
                       size="small"
                       onClick={() => handleDeleteClick(client)}
                       color="error"
+                      title="Delete Client"
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -199,6 +219,16 @@ export const ClientList: React.FC = () => {
         client={selectedClient}
         onClose={handleFormClose}
       />
+
+      {/* Chart Form Dialog */}
+      {chartFormClient && (
+        <ChartFormDialog
+          open={isChartFormOpen}
+          clientId={chartFormClient.id}
+          clientName={chartFormClient.fullName}
+          onClose={handleChartFormClose}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>

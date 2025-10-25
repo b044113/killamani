@@ -43,12 +43,6 @@ export const ClientForm: React.FC<ClientFormProps> = ({ open, client, onClose })
       lastName: '',
       email: '',
       phone: '',
-      birthDate: '',
-      birthTime: '',
-      birthPlace: '',
-      latitude: 0,
-      longitude: 0,
-      timezone: 'UTC',
       notes: '',
     },
   });
@@ -60,12 +54,6 @@ export const ClientForm: React.FC<ClientFormProps> = ({ open, client, onClose })
         lastName: client.lastName,
         email: client.email || '',
         phone: client.phone || '',
-        birthDate: client.birthDate,
-        birthTime: client.birthTime,
-        birthPlace: client.birthPlace,
-        latitude: client.latitude,
-        longitude: client.longitude,
-        timezone: client.timezone,
         notes: client.notes || '',
       });
     } else {
@@ -74,12 +62,6 @@ export const ClientForm: React.FC<ClientFormProps> = ({ open, client, onClose })
         lastName: '',
         email: '',
         phone: '',
-        birthDate: '',
-        birthTime: '',
-        birthPlace: '',
-        latitude: 0,
-        longitude: 0,
-        timezone: 'UTC',
         notes: '',
       });
     }
@@ -169,110 +151,6 @@ export const ClientForm: React.FC<ClientFormProps> = ({ open, client, onClose })
                     {...field}
                     label={t('clients.phone')}
                     fullWidth
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="birthDate"
-                control={control}
-                rules={{ required: t('clients.birthDate') + ' is required' }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label={t('clients.birthDate')}
-                    type="date"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                    error={!!errors.birthDate}
-                    helperText={errors.birthDate?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="birthTime"
-                control={control}
-                rules={{ required: t('clients.birthTime') + ' is required' }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label={t('clients.birthTime')}
-                    type="time"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                    error={!!errors.birthTime}
-                    helperText={errors.birthTime?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Controller
-                name="birthPlace"
-                control={control}
-                rules={{ required: t('clients.birthPlace') + ' is required' }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label={t('clients.birthPlace')}
-                    fullWidth
-                    error={!!errors.birthPlace}
-                    helperText={errors.birthPlace?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Controller
-                name="latitude"
-                control={control}
-                rules={{ required: 'Latitude is required' }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Latitude"
-                    type="number"
-                    fullWidth
-                    inputProps={{ step: 'any' }}
-                    error={!!errors.latitude}
-                    helperText={errors.latitude?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Controller
-                name="longitude"
-                control={control}
-                rules={{ required: 'Longitude is required' }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Longitude"
-                    type="number"
-                    fullWidth
-                    inputProps={{ step: 'any' }}
-                    error={!!errors.longitude}
-                    helperText={errors.longitude?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Controller
-                name="timezone"
-                control={control}
-                rules={{ required: 'Timezone is required' }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Timezone"
-                    fullWidth
-                    error={!!errors.timezone}
-                    helperText={errors.timezone?.message}
                   />
                 )}
               />

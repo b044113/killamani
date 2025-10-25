@@ -23,6 +23,9 @@ class NatalChart:
     id: UUID = field(default_factory=uuid4)
     client_id: UUID = None  # Required
 
+    # Chart Information
+    name: str = "Birth Chart"  # Descriptive name for this chart
+
     # Chart Calculation Data
     data: Dict = field(default_factory=dict)  # Raw calculation data (planets, houses, etc.)
     solar_set: Dict = field(default_factory=dict)  # Sun sign, 5th house, hard aspects

@@ -3,11 +3,24 @@
  *
  * Main layout with sidebar navigation and app bar
  */
-import React, { useState } from 'react';
+import { useAuthStore } from '@/features/auth/hooks/useAuthStore';
+import { LanguageSwitcher } from '@/shared/components/LanguageSwitcher';
+import { useTranslation } from '@/shared/hooks/useTranslation';
+import {
+  AccountCircle as AccountCircleIcon,
+  Dashboard as DashboardIcon,
+  Description as DescriptionIcon,
+  Logout as LogoutIcon,
+  Menu as MenuIcon,
+  People as PeopleIcon,
+  Settings as SettingsIcon,
+} from '@mui/icons-material';
 import {
   AppBar,
+  Avatar,
   Box,
   CssBaseline,
+  Divider,
   Drawer,
   IconButton,
   List,
@@ -15,28 +28,15 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Toolbar,
-  Typography,
-  Avatar,
   Menu,
   MenuItem,
-  Divider,
-  useTheme,
+  Toolbar,
+  Typography,
   useMediaQuery,
+  useTheme,
 } from '@mui/material';
-import {
-  Menu as MenuIcon,
-  Dashboard as DashboardIcon,
-  People as PeopleIcon,
-  Description as DescriptionIcon,
-  Settings as SettingsIcon,
-  Logout as LogoutIcon,
-  AccountCircle as AccountCircleIcon,
-} from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '@/features/auth/hooks/useAuthStore';
-import { useTranslation } from '@/shared/hooks/useTranslation';
-import { LanguageSwitcher } from '@/shared/components/LanguageSwitcher';
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const DRAWER_WIDTH = 240;
 
@@ -114,7 +114,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     <Box>
       <Toolbar sx={{ justifyContent: 'center', py: 2 }}>
         <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold' }}>
-          ✨ AstroJoy
+          ✨ Killamani
         </Typography>
       </Toolbar>
       <Divider />
@@ -175,7 +175,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {navigationItems.find(item => item.path === location.pathname)?.label || 'AstroJoy'}
+            {navigationItems.find(item => item.path === location.pathname)?.label || 'Killamani'}
           </Typography>
           <LanguageSwitcher />
           <IconButton

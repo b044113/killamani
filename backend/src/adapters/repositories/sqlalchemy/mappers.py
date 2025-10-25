@@ -63,6 +63,14 @@ def model_to_user(model: UserModel) -> User:
 
 def client_to_model(client: Client) -> ClientModel:
     """Convert Client entity to ClientModel."""
+    # Handle optional birth_data
+    birth_date = client.birth_data.date if client.birth_data else None
+    birth_city = client.birth_data.city if client.birth_data else None
+    birth_country = client.birth_data.country if client.birth_data else None
+    birth_timezone = client.birth_data.timezone if client.birth_data else None
+    birth_latitude = client.birth_data.latitude if client.birth_data else None
+    birth_longitude = client.birth_data.longitude if client.birth_data else None
+
     return ClientModel(
         id=client.id,
         consultant_id=client.consultant_id,
@@ -70,12 +78,13 @@ def client_to_model(client: Client) -> ClientModel:
         first_name=client.first_name,
         last_name=client.last_name,
         email=client.email,
-        birth_date=client.birth_data.date,
-        birth_city=client.birth_data.city,
-        birth_country=client.birth_data.country,
-        birth_timezone=client.birth_data.timezone,
-        birth_latitude=client.birth_data.latitude,
-        birth_longitude=client.birth_data.longitude,
+        phone=client.phone,
+        birth_date=birth_date,
+        birth_city=birth_city,
+        birth_country=birth_country,
+        birth_timezone=birth_timezone,
+        birth_latitude=birth_latitude,
+        birth_longitude=birth_longitude,
         notes=client.notes,
         created_at=client.created_at,
         updated_at=client.updated_at,
@@ -84,14 +93,17 @@ def client_to_model(client: Client) -> ClientModel:
 
 def model_to_client(model: ClientModel) -> Client:
     """Convert ClientModel to Client entity."""
-    birth_data = BirthData(
-        date=model.birth_date,
-        city=model.birth_city,
-        country=model.birth_country,
-        timezone=model.birth_timezone,
-        latitude=model.birth_latitude,
-        longitude=model.birth_longitude,
-    )
+    # Create BirthData only if birth data exists
+    birth_data = None
+    if model.birth_date and model.birth_city and model.birth_country and model.birth_timezone:
+        birth_data = BirthData(
+            date=model.birth_date,
+            city=model.birth_city,
+            country=model.birth_country,
+            timezone=model.birth_timezone,
+            latitude=model.birth_latitude,
+            longitude=model.birth_longitude,
+        )
 
     return Client(
         id=model.id,
@@ -100,6 +112,7 @@ def model_to_client(model: ClientModel) -> Client:
         first_name=model.first_name,
         last_name=model.last_name,
         email=model.email,
+        phone=model.phone,
         birth_data=birth_data,
         notes=model.notes,
         created_at=model.created_at,
@@ -116,6 +129,7 @@ def natal_chart_to_model(chart: NatalChart) -> NatalChartModel:
     return NatalChartModel(
         id=chart.id,
         client_id=chart.client_id,
+        name=chart.name,
         data=chart.data,
         solar_set=chart.solar_set,
         interpretations=chart.interpretations,
@@ -133,6 +147,7 @@ def model_to_natal_chart(model: NatalChartModel) -> NatalChart:
     return NatalChart(
         id=model.id,
         client_id=model.client_id,
+        name=model.name,
         data=model.data,
         solar_set=model.solar_set,
         interpretations=model.interpretations,

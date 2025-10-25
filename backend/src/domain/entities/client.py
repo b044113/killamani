@@ -31,8 +31,9 @@ class Client:
     first_name: str = ""
     last_name: str = ""
     email: Optional[str] = None
+    phone: Optional[str] = None
 
-    # Birth Data (Value Object)
+    # Birth Data (Value Object) - Optional now, as charts are separate
     birth_data: Optional[BirthData] = None
 
     # Metadata
@@ -46,8 +47,7 @@ class Client:
             raise ValueError("Client must be associated with a consultant")
         if not self.first_name:
             raise ValueError("First name is required")
-        if not self.birth_data:
-            raise ValueError("Birth data is required")
+        # Note: birth_data is now optional - clients can exist without charts
 
     @property
     def full_name(self) -> str:
@@ -67,8 +67,10 @@ class Client:
         self.notes = notes
         self.updated_at = datetime.utcnow()
 
-    def update_contact_info(self, email: Optional[str] = None):
+    def update_contact_info(self, email: Optional[str] = None, phone: Optional[str] = None):
         """Update client's contact information"""
         if email is not None:
             self.email = email
+        if phone is not None:
+            self.phone = phone
         self.updated_at = datetime.utcnow()

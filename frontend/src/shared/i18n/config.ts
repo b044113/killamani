@@ -1,13 +1,13 @@
 import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { initReactI18next } from 'react-i18next';
 
 // Import translation files
-import es from './locales/es.json';
-import en from './locales/en.json';
-import it from './locales/it.json';
-import fr from './locales/fr.json';
 import de from './locales/de.json';
+import en from './locales/en.json';
+import es from './locales/es.json';
+import fr from './locales/fr.json';
+import it from './locales/it.json';
 import pt from './locales/pt.json';
 
 // Available languages
@@ -48,7 +48,7 @@ i18n
       // Cache user language in localStorage
       caches: ['localStorage'],
       // localStorage key
-      lookupLocalStorage: 'astrojoy_language',
+      lookupLocalStorage: 'killamani_language',
     },
     interpolation: {
       escapeValue: false, // React already escapes values

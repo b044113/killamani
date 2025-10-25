@@ -3,8 +3,8 @@ Quick Chart DTOs (Data Transfer Objects)
 
 DTOs for quick chart calculation without requiring a client entity.
 This allows any user to calculate a chart for MVP functionality.
+All DTOs use Pydantic with camelCase aliases for frontend compatibility.
 """
-from dataclasses import dataclass
 from typing import Optional, Dict, List
 from datetime import datetime
 from pydantic import BaseModel, Field
@@ -57,8 +57,7 @@ class QuickCalculateChartDTO(BaseModel):
 # Output DTOs
 # ============================================================================
 
-@dataclass
-class QuickChartResultDTO:
+class QuickChartResultDTO(BaseModel):
     """
     Quick chart calculation result with SVG export.
 
@@ -66,27 +65,16 @@ class QuickChartResultDTO:
     without persisting to database (MVP requirement).
     """
     name: str
-    sun_sign: str
+    sun_sign: str = Field(..., alias='sunSign')
     planets: List[Dict]
     houses: List[Dict]
     aspects: List[Dict]
     angles: Dict
-    solar_set: Dict
-    svg_data: str  # SVG content as string
-    house_system: str
-    calculated_at: datetime
+    solar_set: Dict = Field(..., alias='solarSet')
+    svg_data: str = Field(..., alias='svgData')  # SVG content as string
+    house_system: str = Field(..., alias='houseSystem')
+    calculated_at: datetime = Field(..., alias='calculatedAt')
 
-    def to_dict(self) -> Dict:
-        """Convert to dictionary for JSON serialization."""
-        return {
-            "name": self.name,
-            "sun_sign": self.sun_sign,
-            "planets": self.planets,
-            "houses": self.houses,
-            "aspects": self.aspects,
-            "angles": self.angles,
-            "solar_set": self.solar_set,
-            "svg_data": self.svg_data,
-            "house_system": self.house_system,
-            "calculated_at": self.calculated_at.isoformat(),
-        }
+    class Config:
+        populate_by_name = True
+        by_alias = True

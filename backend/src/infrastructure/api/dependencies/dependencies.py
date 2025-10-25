@@ -50,6 +50,9 @@ from ....application.use_cases.chart_calculation import (
 from ....application.use_cases.chart_calculation.quick_calculate_chart_use_case import (
     QuickCalculateChartUseCase,
 )
+from ....application.use_cases.chart_calculation.create_chart_for_client_use_case import (
+    CreateChartForClientUseCase,
+)
 
 
 # ============================================================================
@@ -289,3 +292,17 @@ def get_quick_calculate_chart_use_case(
             detail="Astrological calculator not available. Please install kerykeion."
         )
     return QuickCalculateChartUseCase(calculator)
+
+
+def get_create_chart_for_client_use_case(
+    calculator: KerykeionCalculator = Depends(get_astro_calculator),
+    client_repo: SQLAlchemyClientRepository = Depends(get_client_repository),
+    chart_repo: SQLAlchemyNatalChartRepository = Depends(get_natal_chart_repository),
+) -> CreateChartForClientUseCase:
+    """Get create chart for client use case instance."""
+    if calculator is None:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="Astrological calculator not available. Please install kerykeion."
+        )
+    return CreateChartForClientUseCase(calculator, client_repo, chart_repo)
